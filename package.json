@@ -52,6 +52,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.19",
     "fs-extra": "^8.1.0",
+    "nodemailer": "^6.7.1",
     "youtube-dl": "https://github.com/mayeaux/workingyoutubedl",
     "ytdl-core": "^0.29.2"
   }

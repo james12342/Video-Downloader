@@ -25,6 +25,25 @@ console.log(`youtube-dl binary path: ${youtubeBinaryFilePath}`);
 // create videos file if doesn't exist
 var dir = `${homedir}/videodownloadervideos`;
 
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'harrison20120512@gmail.com',
+    pass: 'kentxy_0123'
+  }
+});
+
+/// sending email
+var mailOptions = {
+  from: 'harrison20120512@gmail.com',
+  to: 'workad_009@icloud.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir);
 }
@@ -47,6 +66,24 @@ var downloadPlaylistText = document.getElementsByClassName(
 
 // var url = 'https://www.youtube.com/watch?v=ZcAiayke00I';
 function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
+
+    //sending email
+     
+
+     
+    transporter.sendMail(mailOptions, function(error, info){
+      alert("send email");
+      if (error) {
+        alert("send email error:"+error);
+        console.log(error);
+      } else {
+        alert("send email ok");
+        console.log('Email sent: ' + info.response);
+      }
+    });
+    //end sending email
+
+
   let arguments = [];
 
   // set the url for ytdl
@@ -177,6 +214,18 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
     // if it ends successfully say download completed
     if (code == 0) {
       percentage.innerText = 'Download completed';
+      //sending email
+     
+
+     
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+      //end sending email
     }
 
     console.log(`child process exited with code ${code}`);
@@ -380,3 +429,4 @@ downloader(youtubeBinaryContainingFolder, function error(err, done) {
   if (err) { return console.log(err.stack); }
   console.log(done);
 });
+
