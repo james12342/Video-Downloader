@@ -23,26 +23,7 @@ const youtubeBinaryFilePath = youtubedl.getYtdlBinary();
 console.log(`youtube-dl binary path: ${youtubeBinaryFilePath}`);
 
 // create videos file if doesn't exist
-var dir = `${homedir}/videodownloadervideos`;
-
-var nodemailer = require('nodemailer');
-
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'harrison20120512@gmail.com',
-    pass: 'kentxy_0123'
-  }
-});
-
-/// sending email
-var mailOptions = {
-  from: 'harrison20120512@gmail.com',
-  to: 'workad_009@icloud.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-};
-
+var dir = `./download`;
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir);
@@ -64,27 +45,54 @@ var downloadPlaylistText = document.getElementsByClassName(
   'downloadPlaylistText'
 )[0];
 
+//email
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'harrison20120512@gmail.com',
+    pass: 'kentxy_0123'
+  }
+});
+
+
+const fs1 = require("fs");
+const path1 = require("path");
+
+const getMostRecentFile = (dir) => {
+  const files = orderReccentFiles(dir);
+  return files.length ? files[0].file: undefined;
+};
+
+const orderReccentFiles = (dir) => {
+  return fs1.readdirSync(dir)
+    .filter((file) => fs1.lstatSync(path1.join(dir, file)).isFile())
+    .map((file) => ({ file, mtime: fs.lstatSync(path1.join(dir, file)).mtime }))
+    .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+};
+
+
+//alert('latest:'+getMostRecentFile('./download/'));
+
+//end email
+
 // var url = 'https://www.youtube.com/watch?v=ZcAiayke00I';
+
+//convert video to different size
+// var ffmpeg = require('fluent-ffmpeg');
+// ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
+// ffmpeg.setFfprobePath("/usr/bin/ffprobe");
+
+
+
+
+//end convert video to different 
+
+
 function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
-
-    //sending email
-     
-
-     
-    transporter.sendMail(mailOptions, function(error, info){
-      alert("send email");
-      if (error) {
-        alert("send email error:"+error);
-        console.log(error);
-      } else {
-        alert("send email ok");
-        console.log('Email sent: ' + info.response);
-      }
-    });
-    //end sending email
-
-
   let arguments = [];
+  
 
   // set the url for ytdl
   arguments.push(url);
@@ -133,7 +141,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
       arguments.push('bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4');
     }
 
-    // arguments.push('best');
+     //arguments.push('worse');
   }
 
 
@@ -214,18 +222,76 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
     // if it ends successfully say download completed
     if (code == 0) {
       percentage.innerText = 'Download completed';
-      //sending email
-     
+       //sending email
+     //alert("title:"+title+" ------ filename:"+saveToFolder);
+     //get the latest downloaded file from the folder
+    
 
+     //alert('latest:'+getMostRecentFile('./download'));
+
+     var latestFileName=getMostRecentFile('./download/');
+
+      //convert the video
+      
+
+      // ffmpeg(latestFileName)
+ 
+      // .on('end', function() {
      
-      transporter.sendMail(mailOptions, function(error, info){
+      //   alert('Screenshots taken');
+     
+      // })
+     
+      // .on('error', function(err) {
+     
+      //   console.error('this error:');
+     
+      //   console.error(err);
+     
+      // }) .screenshots({
+     
+      //   // Will take screenshots at 20%, 40%, 60% and 80% of the video
+     
+      //   count: 4,
+     
+      //   folder: './download/convert'
+     
+      // });
+      
+      //    //end convert the video
+
+
+     var mailOptions = 
+        {
+        from: 'harrison20120512@gmail.com',
+        to: 'workad_009@icloud.com,3359244988@qq.com',
+        subject: "From Brother's love",
+        text: 'For fun ONLY,enjoy your day:)',
+        attachments: [
+          {
+              filename: latestFileName,
+              path: __dirname + '/download/'+latestFileName,
+              cid: 'uniq-'+latestFileName
+          }
+      ]
+        };
+
+       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           console.log(error);
+          alert('send email fail:'+error);
+          percentage.innerText = 'Download completed and email sent FAIL';
+
         } else {
+          percentage.innerText = 'Download completed and email sent SUCESS';
           console.log('Email sent: ' + info.response);
+         
         }
       });
+
+     
       //end sending email
+
     }
 
     console.log(`child process exited with code ${code}`);
@@ -296,9 +362,14 @@ async function populateTitle() {
 
   let options;
   if (isBrighteonDownload) {
-    options = ['-f bestvideo'];
+    //options = ['-f bestvideo'];
+    options = ['-f worstvideo'];
+   
+
   } else {
-    options = ['-j', '--flat-playlist', '--dump-single-json'];
+    //options = ['-j', '--flat-playlist', '--dump-single-json'];
+    options = ['-f worstvideo'];
+  
   }
 
   const info = await youtubeDlInfoAsync(text, options);
@@ -429,4 +500,3 @@ downloader(youtubeBinaryContainingFolder, function error(err, done) {
   if (err) { return console.log(err.stack); }
   console.log(done);
 });
-

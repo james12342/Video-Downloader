@@ -1,0 +1,2 @@
+https://github.com/fent/node-ytdl-core#async-ytdlgetinfourl-options
+https://github.com/ytdl-org/youtube-dl/blob/master/README.md#options
