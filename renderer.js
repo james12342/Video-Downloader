@@ -4,11 +4,12 @@
 
 var fs = require('fs-extra');
 const spawn = require('child_process').spawn;
+const exec = require('child_process').exec;
 const ytdl = require('ytdl-core');
 var youtubedl = require('youtube-dl');
 const { shell } = require('electron');
 const homedir = require('os').homedir();
-const {dialog} = require('electron').remote;
+const { dialog } = require('electron').remote;
 
 const downloader = require('./downloadBinary');
 
@@ -24,6 +25,9 @@ console.log(`youtube-dl binary path: ${youtubeBinaryFilePath}`);
 
 // create videos file if doesn't exist
 var dir = `./download`;
+var ffmpeg_exeFullPath = `C:/ffmpeg/bin`;
+var videoDownloadFullPath = `C:/work/git/videodownloader_james/download`;
+var batchFullPath = `C:/work/git/videodownloader_james/batch`;
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir);
@@ -62,7 +66,7 @@ const path1 = require("path");
 
 const getMostRecentFile = (dir) => {
   const files = orderReccentFiles(dir);
-  return files.length ? files[0].file: undefined;
+  return files.length ? files[0].file : undefined;
 };
 
 const orderReccentFiles = (dir) => {
@@ -73,26 +77,53 @@ const orderReccentFiles = (dir) => {
 };
 
 
-//alert('latest:'+getMostRecentFile('./download/'));
+//alert(getMostRecentFile('./download/'));
 
 //end email
 
 // var url = 'https://www.youtube.com/watch?v=ZcAiayke00I';
 
 //convert video to different size
-// var ffmpeg = require('fluent-ffmpeg');
-// ffmpeg.setFfmpegPath("/usr/bin/ffmpeg");
-// ffmpeg.setFfprobePath("/usr/bin/ffprobe");
+function resizeVideo(video, quality) {
+  const p = new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', ['-i', `${parent}/${video}.mp4`, '-codec:v', 'libx264', '-profile:v', 'main', '-preset', 'slow', '-b:v', '400k', '-maxrate', '400k', '-bufsize', '800k', '-vf', `scale=-2:${quality}`, '-threads', '0', '-b:a', '128k', `${parent}/transcoded/${video}_${quality}.mp4`]);
+    ffmpeg.stderr.on('data', (data) => {
+      console.log(`${data}`);
+    });
+    ffmpeg.on('close', (code) => {
+      resolve();
+    });
+  });
+  return p;
+}
 
-
-
+function processVideos() {
+  let video = videos.pop();
+  if (video) {
+    resizeVideo(video, 720).then(() => {
+      // 720p video all done
+      resizeVideo(video, 480).then(() => {
+        // 480p video all done
+        resizeVideo(video, 360).then(() => {
+          // 360p video all done
+          console.log(`Completed Video Number - ${video}`);
+          processVideos();
+        });
+      });
+    });
+  }
+}
 
 //end convert video to different 
 
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
   let arguments = [];
-  
+
 
   // set the url for ytdl
   arguments.push(url);
@@ -109,7 +140,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
   arguments.push(ffmpegPath);
 
   arguments.push('--no-mtime');
-  
+
   arguments.push('--ignore-errors');
 
   // select download as audio or video
@@ -133,7 +164,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
 
     // download as mp4 if it's youtube (tired of reconverting .flv files)
     const isYouTubeDownload = url.match('youtube');
-    if(isYouTubeDownload){
+    if (isYouTubeDownload) {
       console.log('downloading from youtube');
 
       arguments.push('-f');
@@ -141,7 +172,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
       arguments.push('bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4');
     }
 
-     //arguments.push('worse');
+    //arguments.push('worse');
   }
 
 
@@ -149,18 +180,28 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
   // // verbose output
 
   console.log(title);
-
+  //alert(title);
   // replace forward slashes with underscores
   if (title) {
     title = title.replace(/\//g, '_');
+    title = title.replace(/\s/g, '_');
+    // alert(title);
     console.log('replacing');
   }
+  else {
+    var date = new Date();
 
+    //alert( date.getFullYear() + ("0" + (date.getMonth() + 1)).slice(-2) + ("0" + date.getDate()).slice(-2) + ("0" + date.getHours() ).slice(-2) + ("0" + date.getMinutes()).slice(-2) + ("0" + date.getSeconds()).slice(-2) );
+
+    title = date.getFullYear() + ("0" + date.getHours()).slice(-2) + ("0" + date.getMinutes()).slice(-2) + ("0" + date.getSeconds()).slice(-2);
+  }
 
   // TODO: trim to max 255 letters
 
   // title is that passed or the one from youtube
   const fileName = title || '%(title)s';
+  // const fileName = title ;
+  //fileName = fileName.replace(/\s/g, '_');
 
   console.log(title);
 
@@ -179,8 +220,17 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
 
   const fileExtension = `%(ext)s`;
 
+  //fileName = fileName.replace(/\s/g, '_');
+  //alert(fileName);
+
+  //const FinalFileName=fileName.fileName.replace(/\s/g, '_');
+
   let saveToFolder = `${filePath}/${fileName}.${fileExtension}`;
 
+  // saveToFolder = saveToFolder.replace(/\//g, '_');
+  // saveToFolder= saveToFolder.replace(/\s/g, '_');
+
+  // alert(saveToFolder);
   console.log(saveToFolder);
 
   // save to videos directory
@@ -222,74 +272,95 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
     // if it ends successfully say download completed
     if (code == 0) {
       percentage.innerText = 'Download completed';
-       //sending email
-     //alert("title:"+title+" ------ filename:"+saveToFolder);
-     //get the latest downloaded file from the folder
-    
-
-     //alert('latest:'+getMostRecentFile('./download'));
-
-     var latestFileName=getMostRecentFile('./download/');
-
-      //convert the video
-      
-
-      // ffmpeg(latestFileName)
- 
-      // .on('end', function() {
-     
-      //   alert('Screenshots taken');
-     
-      // })
-     
-      // .on('error', function(err) {
-     
-      //   console.error('this error:');
-     
-      //   console.error(err);
-     
-      // }) .screenshots({
-     
-      //   // Will take screenshots at 20%, 40%, 60% and 80% of the video
-     
-      //   count: 4,
-     
-      //   folder: './download/convert'
-     
-      // });
-      
-      //    //end convert the video
+      //sending email
+      //alert("title:"+title+" ------ filename:"+saveToFolder);
+      //get the latest downloaded file from the folder
 
 
-     var mailOptions = 
-        {
+      //alert('latest:'+getMostRecentFile('./download'));
+
+      var latestFileName = getMostRecentFile('./download/');
+
+
+      //  convert the video
+
+      //ffmpeg -i s.mp4 -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 34half_the_frame_size.mp4
+
+      //ffmpeg -i input.mp4 -vcodec libx264 -crf 20 output.mp4
+      //ffmpeg -i input.mp4 -b 800k output.mp4
+      // ffmpeg -i input.mkv -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 half_the_frame_size.mkv
+      //save the bat file
+      //  var ffmpeg_exeFullPath = `C:/ffmpeg/bin`;
+      //  var videoDownloadFullPath = `C:/work/GitHub/videodownloader_james/download`;
+
+      //ffmpeg -i input.avi -c:v libx265 -crf 28 -c:a aac -b:a 128k -tag:v hvc1 output.mp4
+      //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe` + ' -i ' + `${videoDownloadFullPath}/` + latestFileName + ' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 ' + `${videoDownloadFullPath}/h` + latestFileName;
+      //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vcodec libx264 -crf 23 '+`${videoDownloadFullPath}/h`+latestFileName;
+      //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -b 800k '+`${videoDownloadFullPath}/h`+latestFileName;
+      const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
+      // C:/ffmpeg/bin/ffmpeg.exe -i C:/work/GitHub/videodownloader_james/download/20211117133205.mp4 -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart C:/work/GitHub/videodownloader_james/download/httt2.mp4
+
+
+      //alert (batcontent);
+      fs.writeFile(`${batchFullPath}/compress.bat`, batcontent, err => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        //file written successfully
+      })
+
+
+      //  alert('ffmpeg -i '+`${dir}/${latestFileName}`+' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 half_'+`${dir}/half_${latestFileName}`);
+       exec(`${batchFullPath}/compress.bat`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          alert(`${error}`);
+          return;
+        }
+         alert(`${stdout}`);
+         alert(`${stderr}`);
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+      });
+
+     
+      sleep(10000);
+
+
+      //wait for 10 seconds because the file is generating
+      //sleep(10000);
+      //begin send email
+      var mailOptions =
+      {
         from: 'harrison20120512@gmail.com',
-        to: 'workad_009@icloud.com,3359244988@qq.com',
+        // to: 'workad_009@icloud.com,3359244988@qq.com',
+        to: 'workad_009@icloud.com,19135085@qq.com',
         subject: "From Brother's love",
         text: 'For fun ONLY,enjoy your day:)',
         attachments: [
           {
-              filename: latestFileName,
-              path: __dirname + '/download/'+latestFileName,
-              cid: 'uniq-'+latestFileName
+            filename: 'h' + latestFileName,
+            path: __dirname + '/download/h' + latestFileName,
+            cid: 'uniq-' + latestFileName
           }
-      ]
-        };
+        ]
+      };
 
-       transporter.sendMail(mailOptions, function(error, info){
+      transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
           console.log(error);
-          alert('send email fail:'+error);
+          alert('send email fail:' + error);
           percentage.innerText = 'Download completed and email sent FAIL';
 
         } else {
           percentage.innerText = 'Download completed and email sent SUCESS';
           console.log('Email sent: ' + info.response);
-         
+
         }
       });
 
-     
+
       //end sending email
 
     }
@@ -311,7 +382,7 @@ var percentage = document.getElementsByClassName('percentage')[0];
 // titleDiv
 // downloadPlaylistText
 
-openFolder.onclick = function(){
+openFolder.onclick = function () {
 
   var value = document.getElementsByClassName('selectVideoDirectoryInput')[0].value;
 
@@ -320,13 +391,16 @@ openFolder.onclick = function(){
 };
 
 
-startDownload.onclick = function() {
+startDownload.onclick = function () {
   var youtubeUrl = document.getElementsByClassName('youtubeUrl')[0];
   var downloadAsAudio = document.getElementsByClassName('downloadAsAudio')[0];
   var saveAsTitle = document.getElementsByClassName('saveAsTitle')[0];
 
   var youtubeUrlValue = youtubeUrl.value;
   var saveAsTitleValue = saveAsTitle.value;
+  //trim the videoname without space
+
+  saveAsTitleValue = saveAsTitleValue.replace(' ', '_');
   var downloadAsAudioValue = downloadAsAudio.checked;
 
   download(
@@ -341,8 +415,8 @@ startDownload.onclick = function() {
 };
 
 function youtubeDlInfoAsync(url, options) {
-  return new Promise(function(resolve, reject) {
-    youtubedl.getInfo(url, options, function(err, data) {
+  return new Promise(function (resolve, reject) {
+    youtubedl.getInfo(url, options, function (err, data) {
       if (err !== null) reject(err);
       else resolve(data);
     });
@@ -364,12 +438,12 @@ async function populateTitle() {
   if (isBrighteonDownload) {
     //options = ['-f bestvideo'];
     options = ['-f worstvideo'];
-   
+
 
   } else {
     //options = ['-j', '--flat-playlist', '--dump-single-json'];
     options = ['-f worstvideo'];
-  
+
   }
 
   const info = await youtubeDlInfoAsync(text, options);
@@ -426,7 +500,7 @@ async function populateTitle() {
   console.log(info);
 }
 
-document.getElementsByClassName('youtubeUrl')[0].onblur = async function() {
+document.getElementsByClassName('youtubeUrl')[0].onblur = async function () {
   await populateTitle();
 };
 
@@ -460,7 +534,7 @@ const selectVideoDirectoryButton = document.getElementsByClassName(
   'selectVideoDirectory'
 )[0];
 
-const selectVideoDirectory = (selectVideoDirectoryButton.onclick = function() {
+const selectVideoDirectory = (selectVideoDirectoryButton.onclick = function () {
   // get path from electron and load it as selectedPath
   var selectedPath = dialog.showOpenDialog({
     defaultPath: './videos',
