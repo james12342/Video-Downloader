@@ -174,9 +174,6 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
 
     //arguments.push('worse');
   }
-
-
-
   // // verbose output
 
   console.log(title);
@@ -226,10 +223,8 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
   //const FinalFileName=fileName.fileName.replace(/\s/g, '_');
 
   let saveToFolder = `${filePath}/${fileName}.${fileExtension}`;
-
   // saveToFolder = saveToFolder.replace(/\//g, '_');
   // saveToFolder= saveToFolder.replace(/\s/g, '_');
-
   // alert(saveToFolder);
   console.log(saveToFolder);
 
@@ -297,7 +292,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe` + ' -i ' + `${videoDownloadFullPath}/` + latestFileName + ' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 ' + `${videoDownloadFullPath}/h` + latestFileName;
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vcodec libx264 -crf 23 '+`${videoDownloadFullPath}/h`+latestFileName;
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -b 800k '+`${videoDownloadFullPath}/h`+latestFileName;
-      const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
+      const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:240:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
       // C:/ffmpeg/bin/ffmpeg.exe -i C:/work/GitHub/videodownloader_james/download/20211117133205.mp4 -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart C:/work/GitHub/videodownloader_james/download/httt2.mp4
 
 
@@ -325,43 +320,12 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
       });
 
      
-      sleep(10000);
+      //sleep(10000);
 
 
       //wait for 10 seconds because the file is generating
       //sleep(10000);
-      //begin send email
-      var mailOptions =
-      {
-        from: 'harrison20120512@gmail.com',
-        // to: 'workad_009@icloud.com,3359244988@qq.com',
-        to: 'workad_009@icloud.com,19135085@qq.com',
-        subject: "From Brother's love",
-        text: 'For fun ONLY,enjoy your day:)',
-        attachments: [
-          {
-            filename: 'h' + latestFileName,
-            path: __dirname + '/download/h' + latestFileName,
-            cid: 'uniq-' + latestFileName
-          }
-        ]
-      };
-
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-          alert('send email fail:' + error);
-          percentage.innerText = 'Download completed and email sent FAIL';
-
-        } else {
-          percentage.innerText = 'Download completed and email sent SUCESS';
-          console.log('Email sent: ' + info.response);
-
-        }
-      });
-
-
-      //end sending email
+     
 
     }
 
@@ -378,15 +342,70 @@ var openFolder = document.getElementsByClassName('openFolder')[0];
 // percentage div
 var percentage = document.getElementsByClassName('percentage')[0];
 
+//start email button
+var startEmail=document.getElementsByClassName('startEmail')[0];
+
+//Add watermark
+var Watermarklogo=document.getElementsByClassName('Watermarklogo')[0];
+
+//compress video
+var CompressVideo=document.getElementsByClassName('CompressVideo')[0];
+
 // playlistDownloadingDiv
 // titleDiv
 // downloadPlaylistText
 
+startEmail.onclick = function () {
+  var emailAddress = document.getElementsByClassName('emailList')[0].value;
+ 
+  var latestFileName = getMostRecentFile('./download/');
+
+  alert(latestFileName);
+   //begin send email
+   var mailOptions =
+   {
+     from: 'harrison20120512@gmail.com',
+     // to: 'workad_009@icloud.com,3359244988@qq.com',
+     to: emailAddress,
+     subject: "From Brother's love",
+     text: 'For fun ONLY,enjoy your day:)',
+     attachments: [
+       {
+         // filename: 'h' + latestFileName,
+         // path: __dirname + '/download/h' + latestFileName,
+         // cid: 'uniq-' + latestFileName
+
+         filename: latestFileName,
+         path: __dirname + '/download/' + latestFileName,
+         cid: 'uniq-' + latestFileName
+       }
+     ]
+   };
+
+   transporter.sendMail(mailOptions, function (error, info) {
+     if (error) {
+       console.log(error);
+       alert('send email fail:' + error);
+       percentage.innerText = 'Download completed and email sent FAIL';
+
+     } else {
+      alert('email sent SUCESS');
+       percentage.innerText = 'Download completed and email sent SUCESS';
+       
+       console.log('Email sent: ' + info.response);
+
+     }
+   });
+
+
+   //end sending email
+
+ 
+};
+
+
 openFolder.onclick = function () {
-
   var value = document.getElementsByClassName('selectVideoDirectoryInput')[0].value;
-
-
   shell.openItem(value);
 };
 
@@ -414,6 +433,75 @@ startDownload.onclick = function () {
   percentage.scrollIntoView();
 };
 
+Watermarklogo.onclick=function()
+{
+//alert('water mark');
+var latestFileName = getMostRecentFile('./download/');
+alert(latestFileName);
+//execute the watermark command
+const l_water=exec(`C:/ffmpeg/bin/ffmpeg.exe  -i C:/work/git/videodownloader_james/download/`+`${latestFileName}`+' -i C:/work/git/videodownloader_james/logo2.jpg -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy C:/work/git/videodownloader_james/download/W_'+`${latestFileName}`, (error, stdout, stderr) => {
+  alert(`C:/ffmpeg/bin/ffmpeg.exe  -i C:/work/git/videodownloader_james/download/`+`${latestFileName}`+' -i C:/work/git/videodownloader_james/logo2.jpg -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy C:/work/git/videodownloader_james/download/W_'+`${latestFileName}`);
+  if (error) {
+    console.error(`exec error: ${error}`);
+    alert(`${error}`);
+    return;
+  }
+
+  l_water.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_water.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_water.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+});
+//end watermark
+
+
+};
+
+CompressVideo.onclick=function()
+{
+
+  var latestFileName = getMostRecentFile('./download/');
+alert(latestFileName);
+      const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:240:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
+      
+      fs.writeFile(`${batchFullPath}/compress.bat`, batcontent, err => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        //file written successfully
+      })
+      //  alert('ffmpeg -i '+`${dir}/${latestFileName}`+' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 half_'+`${dir}/half_${latestFileName}`);
+       exec(`${batchFullPath}/compress.bat`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          alert(`${error}`);
+          return;
+        }
+         alert(`${stdout}`);
+         alert(`${stderr}`);
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+      });
+
+
+};
 function youtubeDlInfoAsync(url, options) {
   return new Promise(function (resolve, reject) {
     youtubedl.getInfo(url, options, function (err, data) {
@@ -427,10 +515,8 @@ async function populateTitle() {
 
   // get save as title div
   var saveAsTitle = document.getElementsByClassName('saveAsTitle')[0];
-
   // get text from youtube url div value
   let text = document.getElementsByClassName('youtubeUrl')[0].value;
-
 
   const isBrighteonDownload = text.match('brighteon');
 

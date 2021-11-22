@@ -1,0 +1,1 @@
+C:/ffmpeg/bin/ffmpeg.exe  -i C:\work\git\videodownloader_james\download/sample.mp4 -i C:\work\git\videodownloader_james\logo.png -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy C:\work\git\videodownloader_james\download\W_sample.mp4
