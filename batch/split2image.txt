@@ -1,0 +1,1 @@
+C:/ffmpeg/bin/ffmpeg.exe  -i C:\work\git\videodownloader_james\download\W_2021194154.mp4 image%d.jpg

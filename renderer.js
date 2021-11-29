@@ -6,10 +6,17 @@ var fs = require('fs-extra');
 const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const ytdl = require('ytdl-core');
+//const sharp = require("sharp");
 var youtubedl = require('youtube-dl');
 const { shell } = require('electron');
 const homedir = require('os').homedir();
 const { dialog } = require('electron').remote;
+const fs1 = require("fs");
+const path1 = require("path");
+
+//alert(sharp.versions);
+
+
 
 const downloader = require('./downloadBinary');
 
@@ -61,8 +68,7 @@ var transporter = nodemailer.createTransport({
 });
 
 
-const fs1 = require("fs");
-const path1 = require("path");
+
 
 const getMostRecentFile = (dir) => {
   const files = orderReccentFiles(dir);
@@ -292,32 +298,32 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe` + ' -i ' + `${videoDownloadFullPath}/` + latestFileName + ' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 ' + `${videoDownloadFullPath}/h` + latestFileName;
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vcodec libx264 -crf 23 '+`${videoDownloadFullPath}/h`+latestFileName;
       //const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -b 800k '+`${videoDownloadFullPath}/h`+latestFileName;
-      const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:240:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
-      // C:/ffmpeg/bin/ffmpeg.exe -i C:/work/GitHub/videodownloader_james/download/20211117133205.mp4 -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart C:/work/GitHub/videodownloader_james/download/httt2.mp4
+      // const batcontent = `${ffmpeg_exeFullPath}/ffmpeg.exe`+' -i '+`${videoDownloadFullPath}/`+latestFileName+' -vf "scale=-2:240:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart '+`${videoDownloadFullPath}/h`+latestFileName;
+      // // C:/ffmpeg/bin/ffmpeg.exe -i C:/work/GitHub/videodownloader_james/download/20211117133205.mp4 -vf "scale=-2:720:flags=lanczos" -vcodec libx264 -profile:v main -level 3.1 -preset medium -crf 24 -x264-params ref=4 -acodec copy -movflags +faststart C:/work/GitHub/videodownloader_james/download/httt2.mp4
 
 
-      //alert (batcontent);
-      fs.writeFile(`${batchFullPath}/compress.bat`, batcontent, err => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        //file written successfully
-      })
+      // //alert (batcontent);
+      // fs.writeFile(`${batchFullPath}/compress.bat`, batcontent, err => {
+      //   if (err) {
+      //     console.error(err)
+      //     return
+      //   }
+      //   //file written successfully
+      // })
 
 
-      //  alert('ffmpeg -i '+`${dir}/${latestFileName}`+' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 half_'+`${dir}/half_${latestFileName}`);
-       exec(`${batchFullPath}/compress.bat`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`exec error: ${error}`);
-          alert(`${error}`);
-          return;
-        }
-         alert(`${stdout}`);
-         alert(`${stderr}`);
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
-      });
+      // //  alert('ffmpeg -i '+`${dir}/${latestFileName}`+' -vf "scale=trunc(iw/4)*2:trunc(ih/4)*2" -c:v libx265 -crf 28 half_'+`${dir}/half_${latestFileName}`);
+      //  exec(`${batchFullPath}/compress.bat`, (error, stdout, stderr) => {
+      //   if (error) {
+      //     console.error(`exec error: ${error}`);
+      //     alert(`${error}`);
+      //     return;
+      //   }
+      //    alert(`${stdout}`);
+      //    alert(`${stderr}`);
+      //   console.log(`stdout: ${stdout}`);
+      //   console.error(`stderr: ${stderr}`);
+      // });
 
      
       //sleep(10000);
@@ -350,6 +356,10 @@ var Watermarklogo=document.getElementsByClassName('Watermarklogo')[0];
 
 //compress video
 var CompressVideo=document.getElementsByClassName('CompressVideo')[0];
+
+//Image convert to video
+
+var Images2Video=document.getElementsByClassName('Images2Video')[0];
 
 // playlistDownloadingDiv
 // titleDiv
@@ -502,6 +512,46 @@ alert(latestFileName);
 
 
 };
+
+
+
+async function getMetadata() {
+  try {
+    const metadata = await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg").metadata();
+    console.log(metadata);
+  } catch (error) {
+    console.log(`An error occurred during processing: ${error}`);
+  }
+}
+
+//getMetadata();
+
+async function resizeImage() {
+  try {
+    await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg")
+      .resize({
+        width: 150,
+        height: 97
+      })
+      .toFile("sammy-resized.png");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//resizeImage();
+
+
+Images2Video.onclick=function()
+{
+  alert("resize image");
+  //window.open('https://github.com', '_blank', 'top=500,left=200,frame=false,nodeIntegration=no');
+  // renderer process (mainWindow)
+const childWindow = window.open('', 'modal')
+childWindow.loadFile('index.html');
+  
+};
+
 function youtubeDlInfoAsync(url, options) {
   return new Promise(function (resolve, reject) {
     youtubedl.getInfo(url, options, function (err, data) {
@@ -660,3 +710,49 @@ downloader(youtubeBinaryContainingFolder, function error(err, done) {
   if (err) { return console.log(err.stack); }
   console.log(done);
 });
+
+
+//images to video
+
+
+
+const promises = [];
+
+promises.push(
+  sharpStream
+    .clone()
+    .jpeg({ quality: 100 })
+    .toFile("originalFile.jpg")
+);
+
+promises.push(
+  sharpStream
+    .clone()
+    .resize({ width: 500 })
+    .jpeg({ quality: 80 })
+    .toFile("optimized-500.jpg")
+);
+
+promises.push(
+  sharpStream
+    .clone()
+    .resize({ width: 500 })
+    .webp({ quality: 80 })
+    .toFile("optimized-500.webp")
+);
+
+// https://github.com/sindresorhus/got#gotstreamurl-options
+got.stream("https://media.istockphoto.com/photos/happy-thanksgiving-day-greeting-text-with-pumpkins-squash-and-leaves-picture-id1181113921?s=612x612").pipe(sharpStream);
+alert("download image");
+Promise.all(promises)
+  .then(res => { console.log("Done!", res); })
+  .catch(err => {
+    console.error("Error processing files, let's clean it up", err);
+    try {
+      fs.unlinkSync("originalFile.jpg");
+      fs.unlinkSync("optimized-500.jpg");
+      fs.unlinkSync("optimized-500.webp");
+    } catch (e) {}
+  });
+
+//end images to video
