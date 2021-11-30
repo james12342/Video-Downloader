@@ -1,1 +1,1 @@
-taskkill /f /im node.exe
+taskkill /im node.exe /F

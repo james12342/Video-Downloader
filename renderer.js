@@ -14,6 +14,11 @@ const { dialog } = require('electron').remote;
 const fs1 = require("fs");
 const path1 = require("path");
 
+
+const { fork } = require('child_process')
+const ps = fork(`${__dirname}/server.js`)
+
+
 //alert(sharp.versions);
 
 const CurrentDir=__dirname.replace(/\\/g,'/');
