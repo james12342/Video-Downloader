@@ -5,8 +5,8 @@ const args = require('minimist')(process.argv.slice(2))
 console.log(args['keyword']); //joe);
 
 //const fromFolder = 'C:/work/git/videodownloader_james/download/'+args['keyword'];
-const fromFolder = 'C:/work/git/videodownloader_james/download/'+args['keyword']+'/output';
-const toFolder = 'C:/work/git/videodownloader_james/download/'+args['keyword']+'/output/output1';
+const fromFolder = __dirname.replace(/\\/g,'/')+"/download/"+args['keyword']+'/output';
+const toFolder =  __dirname.replace(/\\/g,'/')+"/download/"+args['keyword']+'/output/output1';
 if (!fs.existsSync(fromFolder)) {
     fs.mkdirSync(fromFolder, 0744);
 }
@@ -36,4 +36,5 @@ fs.readdir(fromFolder, (err, files) => {
 })
 
 //end first round to get everyimage jpg
+
 

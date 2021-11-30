@@ -361,11 +361,13 @@ var CompressVideo=document.getElementsByClassName('CompressVideo')[0];
 
 //Image convert to video
 
-var Images2Video=document.getElementsByClassName('Images2Video')[0];
 
-// playlistDownloadingDiv
-// titleDiv
-// downloadPlaylistText
+
+var ImagesDownload=document.getElementsByClassName('ImagesDownload')[0];
+
+
+var ImagesConvertVideo=document.getElementsByClassName('ImagesConvertVideo')[0];
+
 
 startEmail.onclick = function () {
   var emailAddress = document.getElementsByClassName('emailList')[0].value;
@@ -383,9 +385,7 @@ startEmail.onclick = function () {
      text: 'For fun ONLY,enjoy your day:)',
      attachments: [
        {
-         // filename: 'h' + latestFileName,
-         // path: __dirname + '/download/h' + latestFileName,
-         // cid: 'uniq-' + latestFileName
+         
 
          filename: latestFileName,
          path: __dirname + '/download/' + latestFileName,
@@ -417,7 +417,7 @@ startEmail.onclick = function () {
 
 
 openFolder.onclick = function () {
-  var value = document.getElementsByClassName('selectVideoDirectoryInput')[0].value;
+  var value = CurrentDir+"/download";
   shell.openItem(value);
 };
 
@@ -516,6 +516,144 @@ alert(latestFileName);
 
 };
 
+ImagesDownload.onclick=function()
+{
+alert('Downloading images');
+
+var Scraper = require('images-scraper');
+//const sharp = require("sharp");
+
+var fs2 = require('fs'),
+    request = require('request');
+
+
+const google = new Scraper({
+  puppeteer: {
+    headless: true,
+  },
+});
+
+
+const keyword=document.getElementsByClassName('ImageKeyword')[0].value;
+alert(keyword);
+var savedir = __dirname + '/download/'+keyword;
+if (!fs2.existsSync(savedir)) {
+  fs2.mkdirSync(savedir, 0744);
+}
+
+(async () => {
+  const results = await google.scrape(keyword, 200);
+
+  
+  console.log(results);
+  var jsonParsedArray = JSON.parse(JSON.stringify(results));
+
+  for (i=0; i<jsonParsedArray.length; i++)
+  {
+    var title=jsonParsedArray[i].title;
+    var url=jsonParsedArray[i].url;
+    console.log('title:'+title+'||| url:'+url); 
+   
+    download(url, savedir+'/google_'+i+'.jpg', function(){
+      //console.log(i+'---> download completed:'+title);
+
+    })
+     
+ }
+
+
+})();
+
+alert('Images download completed');
+var download = function(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs2.createWriteStream(filename)).on('close', callback);
+  });
+};
+}
+
+ImagesConvertVideo.onclick=function()
+{
+
+
+alert(document.getElementsByClassName('ImageKeyword')[0].value);
+const l_resize=exec(`node sharpImages.js --keyword `+document.getElementsByClassName('ImageKeyword')[0].value, (error, stdout, stderr) => {
+ 
+  if (error) {
+    console.error(`exec error: ${error}`);
+    alert(`${error}`);
+   // return;
+   sleep(10000);
+   //now, make the video
+   alert("now images converting to video");
+var videoFolder=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
+const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder}`+`/output.mp4`, (error, stdout, stderr) => {
+ 
+  if (error) {
+    console.error(`exec error: ${error}`);
+    percentage.innerText = error;
+    alert(`${error}`);
+    return;
+  }
+
+  l_makevideo.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_makevideo.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_makevideo.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+})
+
+//end make the video
+
+
+  }
+
+  l_resize.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_resize.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_resize.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+
+alert('resize images completed');
+
+
+})
+
+
+}
 
 
 async function getMetadata() {
