@@ -3,11 +3,16 @@ const sharp = require("sharp");
 const fs = require('fs');
 const args = require('minimist')(process.argv.slice(2))
 
-console.log(args['keyword']); //joe);
 
-const fromFolder = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword'];
-const toFolder = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword']+'/output';
-const toFolder1 = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword']+'/output/output1';
+
+//alert(args.k);
+console.log(args.k); //joe);
+const ImageFolderName=args.k.replace('#', ' ');
+
+const fromFolder = __dirname.replace(/\\/g,'/')+'/download/'+ImageFolderName;
+const toFolder = __dirname.replace(/\\/g,'/')+'/download/'+ImageFolderName+'/output';
+const toFolder1 = __dirname.replace(/\\/g,'/')+'/download/'+ImageFolderName+'/output/output1';
+
 if (!fs.existsSync(toFolder)) {
     fs.mkdirSync(toFolder, 0744);
 }
@@ -38,7 +43,7 @@ fs.readdir(fromFolder, (err, files) => {
 
 
 //execute the watermark command
-const l_sharp2=exec(`node sharpImages2.js --keyword `+args['keyword'], (error, stdout, stderr) => {
+const l_sharp2=exec(`node sharpImages2.js --k `+args.k, (error, stdout, stderr) => {
     
     if (error) {
       console.error(`exec error: ${error}`);

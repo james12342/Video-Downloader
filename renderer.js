@@ -360,14 +360,17 @@ var Watermarklogo=document.getElementsByClassName('Watermarklogo')[0];
 var CompressVideo=document.getElementsByClassName('CompressVideo')[0];
 
 //Image convert to video
-
-
-
 var ImagesDownload=document.getElementsByClassName('ImagesDownload')[0];
 
+//resize the images
+var ImagesResize=document.getElementsByClassName('ImagesResize')[0];
 
-var ImagesConvertVideo=document.getElementsByClassName('ImagesConvertVideo')[0];
+//image gen to video
+var ImagesGenVideo=document.getElementsByClassName('ImagesGenVideo')[0];
 
+// kill all nodejs process
+
+var RefreshNode=document.getElementsByClassName('RefreshNode')[0];
 
 startEmail.onclick = function () {
   var emailAddress = document.getElementsByClassName('emailList')[0].value;
@@ -518,7 +521,7 @@ alert(latestFileName);
 
 ImagesDownload.onclick=function()
 {
-alert('Downloading images');
+
 
 var Scraper = require('images-scraper');
 //const sharp = require("sharp");
@@ -535,7 +538,7 @@ const google = new Scraper({
 
 
 const keyword=document.getElementsByClassName('ImageKeyword')[0].value;
-alert(keyword);
+alert('Downloading images for:'+keyword);
 var savedir = __dirname + '/download/'+keyword;
 if (!fs2.existsSync(savedir)) {
   fs2.mkdirSync(savedir, 0744);
@@ -564,7 +567,7 @@ if (!fs2.existsSync(savedir)) {
 
 })();
 
-alert('Images download completed');
+//alert('Images download completed');
 var download = function(uri, filename, callback){
   request.head(uri, function(err, res, body){
     //console.log('content-type:', res.headers['content-type']);
@@ -575,21 +578,95 @@ var download = function(uri, filename, callback){
 };
 }
 
-ImagesConvertVideo.onclick=function()
+ImagesResize.onclick=function()
 {
 
+var imageFolderName=document.getElementsByClassName('ImageKeyword')[0].value;
+imageFolderName=imageFolderName.replace(' ','#');
 
-alert(document.getElementsByClassName('ImageKeyword')[0].value);
-const l_resize=exec(`node sharpImages.js --keyword `+document.getElementsByClassName('ImageKeyword')[0].value, (error, stdout, stderr) => {
- 
+const l_resize=exec(`node sharpImages.js --k `+imageFolderName, (error, stdout, stderr) => {
+  alert(`node sharpImages.js --k `+imageFolderName);
   if (error) {
     console.error(`exec error: ${error}`);
     alert(`${error}`);
    // return;
-   sleep(10000);
+//    sleep(10000);
+//    //now, make the video
+//    alert("now images converting to video");
+// var videoFolder=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
+// const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder}`+`/output.mp4`, (error, stdout, stderr) => {
+ 
+//   if (error) {
+//     console.error(`exec error: ${error}`);
+//     percentage.innerText = error;
+//     alert(`${error}`);
+//     return;
+//   }
+
+//   l_makevideo.stdout.on('data', data => {
+//     percentage.innerText = data;
+
+//     console.log(`stdout: ${data}`);
+//   });
+//   l_makevideo.stdio.on('data', data => {
+//     percentage.innerText = data;
+
+//     console.log(`stdio: ${data}`);
+//   });
+//   l_makevideo.stderr.on('data', data => {
+//     percentage.innerText = data;
+
+//     console.log(`stderr: ${data}`);
+//   });
+
+//    alert(`${stdout}`);
+//    alert(`${stderr}`);
+//   console.log(`stdout: ${stdout}`);
+//   console.error(`stderr: ${stderr}`);
+// })
+
+// //end make the video
+
+
+  }
+
+  l_resize.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_resize.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_resize.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+
+alert('resize images completed');
+
+
+})
+
+
+}
+
+ImagesGenVideo.onclick=function()
+{
+
+     //sleep(10000);
    //now, make the video
-   alert("now images converting to video");
+ 
 var videoFolder=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
+alert(`${videoFolder}`+`/output.mp4`);
 const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder}`+`/output.mp4`, (error, stdout, stderr) => {
  
   if (error) {
@@ -621,36 +698,43 @@ const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg
   console.error(`stderr: ${stderr}`);
 })
 
+alert("Video Generated successfully at:"+`${videoFolder}`+`/output.mp4`);
 //end make the video
 
+}
 
-  }
 
-  l_resize.stdout.on('data', data => {
-    percentage.innerText = data;
+RefreshNode.onclick=function(){
 
-    console.log(`stdout: ${data}`);
+  const l_killnode=exec(`taskkill /f /im node.exe`, (error, stdout, stderr) => {
+   // alert(`C:/ffmpeg/bin/ffmpeg.exe  -i `+`${videoDownloadFullPath}`+'/'+`${latestFileName}`+' -i '+`${waterinkLogo}`+' -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy '+`${videoDownloadFullPath}/W_`+`${latestFileName}`);
+    if (error) {
+      console.error(`exec error: ${error}`);
+      alert(`${error}`);
+      return;
+    }
+  
+    l_killnode.stdout.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stdout: ${data}`);
+    });
+    l_killnode.stdio.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stdio: ${data}`);
+    });
+    l_killnode.stderr.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stderr: ${data}`);
+    });
+  
+     alert(`${stdout}`);
+     alert(`${stderr}`);
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
   });
-  l_resize.stdio.on('data', data => {
-    percentage.innerText = data;
-
-    console.log(`stdio: ${data}`);
-  });
-  l_resize.stderr.on('data', data => {
-    percentage.innerText = data;
-
-    console.log(`stderr: ${data}`);
-  });
-
-   alert(`${stdout}`);
-   alert(`${stderr}`);
-  console.log(`stdout: ${stdout}`);
-  console.error(`stderr: ${stderr}`);
-
-alert('resize images completed');
-
-
-})
 
 
 }
