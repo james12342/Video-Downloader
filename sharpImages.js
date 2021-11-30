@@ -1,19 +1,35 @@
+const exec = require('child_process').exec;
 const sharp = require("sharp");
 const fs = require('fs');
+const args = require('minimist')(process.argv.slice(2))
 
-const testFolder = 'C:/work/git/videodownloader_james/download/test/';
+console.log(args['keyword']); //joe);
 
+const fromFolder = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword'];
+const toFolder = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword']+'/output';
+const toFolder1 = __dirname.replace(/\\/g,'/')+'/download/'+args['keyword']+'/output/output1';
+if (!fs.existsSync(toFolder)) {
+    fs.mkdirSync(toFolder, 0744);
+}
+if (!fs.existsSync(toFolder1)) {
+    fs.mkdirSync(toFolder1, 0744);
+}
+
+//first round to get everyimage jpg
 var i=1;
-fs.readdir(testFolder, (err, files) => {
+fs.readdir(fromFolder, (err, files) => {
    files.forEach(file => {
        if(file.includes('.jpg'))
        {
-        
-        console.log(file); // use those file and return it as a REST API
-        sharp("C:/work/git/videodownloader_james/download/test/"+file)
+        try {
+            console.log(file); // use those file and return it as a REST API
+        sharp(fromFolder+"/"+file)
        .resize({ width: 1800, height: 1200 })
-       .toFile("C:/work/git/videodownloader_james/download/test/output/img_"+i+".jpg");
+       .toFile(fromFolder+"/output/img_"+i+".jpg");
        i++;
+          } catch (error) {
+            console.error(error); 
+          }
        }
     
      // alert(file);
@@ -21,6 +37,62 @@ fs.readdir(testFolder, (err, files) => {
 })
 
 
+//execute the watermark command
+const l_sharp2=exec(`node sharpImages2.js --keyword `+args['keyword'], (error, stdout, stderr) => {
+    
+    if (error) {
+      console.error(`exec error: ${error}`);
+      alert(`${error}`);
+     // return;
+    }
+  
+    l_sharp2.stdout.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stdout: ${data}`);
+    });
+    l_sharp2.stdio.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stdio: ${data}`);
+    });
+    l_sharp2.stderr.on('data', data => {
+      percentage.innerText = data;
+  
+      console.log(`stderr: ${data}`);
+    });
+  
+     alert(`${stdout}`);
+     alert(`${stderr}`);
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+  });
+
+
+//end first round to get everyimage jpg
+
+// //second round to get everyimage jpg
+// var j=1;
+// fs.readdir(toFolder, (err, files1) => {
+//    files1.forEach(file1 => {
+//        if(file1.includes('.jpg'))
+//        {
+//         try {
+//             console.log(file1); // use those file and return it as a REST API
+//         sharp(toFolder+"/"+file1)
+//        .resize({ width: 1800, height: 1200 })
+//        .toFile(toFolder1+"/img_"+j+".jpg");
+//        j++;
+//           } catch (error) {
+//             console.error(error); 
+//           }
+//        }
+    
+//      // alert(file);
+//    });
+// })
+
+//end second round to get everyimage jpg
 
 
 

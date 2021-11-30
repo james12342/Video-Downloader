@@ -13,11 +13,15 @@ const homedir = require('os').homedir();
 const { dialog } = require('electron').remote;
 const fs1 = require("fs");
 const path1 = require("path");
+// var Scraper = require('images-scraper');
+// const sharp = require("sharp");
+
+//const sharp = require("sharp");
+
+
 
 //alert(sharp.versions);
 
-const CurrentDir=__dirname.replace(/\\/g,'/');
-const waterinkLogo=CurrentDir+"/logo2.jpg";
 
 
 const downloader = require('./downloadBinary');
@@ -35,8 +39,8 @@ console.log(`youtube-dl binary path: ${youtubeBinaryFilePath}`);
 // create videos file if doesn't exist
 var dir = `./download`;
 var ffmpeg_exeFullPath = `C:/ffmpeg/bin`;
-var videoDownloadFullPath = CurrentDir+`/download`;
-var batchFullPath = CurrentDir+`/batch`;
+var videoDownloadFullPath = `C:/work/git/videodownloader_james/download`;
+var batchFullPath = `C:/work/git/videodownloader_james/batch`;
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir);
@@ -341,6 +345,7 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
   });
 }
 
+
 // start download button
 var startDownload = document.getElementsByClassName('startDownload')[0];
 
@@ -362,6 +367,15 @@ var CompressVideo=document.getElementsByClassName('CompressVideo')[0];
 //Image convert to video
 
 var Images2Video=document.getElementsByClassName('Images2Video')[0];
+
+
+//Image download
+var ImagesDownload=document.getElementsByClassName('ImagesDownload')[0];
+
+//images convert to video
+
+var Images2Video=document.getElementsByClassName('Images2Video')[0];
+
 
 // playlistDownloadingDiv
 // titleDiv
@@ -421,6 +435,33 @@ openFolder.onclick = function () {
   shell.openItem(value);
 };
 
+async function getMetadata() {
+  try {
+    const metadata = await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg").metadata();
+    console.log(metadata);
+  } catch (error) {
+    console.log(`An error occurred during processing: ${error}`);
+  }
+}
+
+//getMetadata();
+
+async function resizeImage() {
+  try {
+    await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg")
+      .resize({
+        width: 150,
+        height: 97
+      })
+      .toFile("sammy-resized.png");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//resizeImage();
+
+
 
 startDownload.onclick = function () {
   var youtubeUrl = document.getElementsByClassName('youtubeUrl')[0];
@@ -434,6 +475,7 @@ startDownload.onclick = function () {
   saveAsTitleValue = saveAsTitleValue.replace(' ', '_');
   var downloadAsAudioValue = downloadAsAudio.checked;
 
+  alert('start downloing');
   download(
     youtubeUrlValue,
     saveAsTitleValue,
@@ -451,9 +493,8 @@ Watermarklogo.onclick=function()
 var latestFileName = getMostRecentFile('./download/');
 alert(latestFileName);
 //execute the watermark command
-
-const l_water=exec(`C:/ffmpeg/bin/ffmpeg.exe  -i `+`${videoDownloadFullPath}`+'/'+`${latestFileName}`+' -i '+`${waterinkLogo}`+' -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy '+`${videoDownloadFullPath}/W_`+`${latestFileName}`, (error, stdout, stderr) => {
-  alert(`C:/ffmpeg/bin/ffmpeg.exe  -i `+`${videoDownloadFullPath}`+'/'+`${latestFileName}`+' -i '+`${waterinkLogo}`+' -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy '+`${videoDownloadFullPath}/W_`+`${latestFileName}`);
+const l_water=exec(`C:/ffmpeg/bin/ffmpeg.exe  -i C:/work/git/videodownloader_james/download/`+`${latestFileName}`+' -i C:/work/git/videodownloader_james/logo2.jpg -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy C:/work/git/videodownloader_james/download/W_'+`${latestFileName}`, (error, stdout, stderr) => {
+  alert(`C:/ffmpeg/bin/ffmpeg.exe  -i C:/work/git/videodownloader_james/download/`+`${latestFileName}`+' -i C:/work/git/videodownloader_james/logo2.jpg -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*0.1[logo][video];[video][logo]overlay=W-w-5:H-h-5" -c:a copy C:/work/git/videodownloader_james/download/W_'+`${latestFileName}`);
   if (error) {
     console.error(`exec error: ${error}`);
     alert(`${error}`);
@@ -517,41 +558,150 @@ alert(latestFileName);
 };
 
 
+ImagesDownload.onclick=function()
+{
+//alert('Images download');
+  var Scraper = require('images-scraper');
+//const sharp = require("sharp");
 
-async function getMetadata() {
-  try {
-    const metadata = await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg").metadata();
-    console.log(metadata);
-  } catch (error) {
-    console.log(`An error occurred during processing: ${error}`);
-  }
+var fs2 = require('fs'),
+    request = require('request');
+
+
+const google = new Scraper({
+  puppeteer: {
+    headless: true,
+  },
+});
+
+
+const keyword=document.getElementsByClassName('ImageKeyword')[0].value;
+//alert(keyword);
+var savedir = __dirname + '/download/'+keyword;
+if (!fs2.existsSync(savedir)) {
+  fs2.mkdirSync(savedir, 0744);
 }
 
-//getMetadata();
+(async () => {
+  const results = await google.scrape(keyword, 200);
 
-async function resizeImage() {
-  try {
-    await sharp("C:/work/git/videodownloader_james/download/test/img1.jpg")
-      .resize({
-        width: 150,
-        height: 97
-      })
-      .toFile("sammy-resized.png");
-  } catch (error) {
-    console.log(error);
-  }
-}
+  
+  console.log(results);
+  var jsonParsedArray = JSON.parse(JSON.stringify(results));
 
-//resizeImage();
+  for (i=0; i<jsonParsedArray.length; i++)
+  {
+    var title=jsonParsedArray[i].title;
+    var url=jsonParsedArray[i].url;
+    console.log('title:'+title+'||| url:'+url); 
+   
+    download(url, savedir+'/google_'+i+'.jpg', function(){
+      //console.log(i+'---> download completed:'+title);
 
+    })
+   
+    
+ }
+
+
+})();
+
+var download = function(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs2.createWriteStream(filename)).on('close', callback);
+  });
+};
+};
+
+
+var download = function(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    //console.log('content-type:', res.headers['content-type']);
+    //console.log('content-length:', res.headers['content-length']);
+    request(uri).pipe(fs2.createWriteStream(filename)).on('close', callback);
+  });
+};
 
 Images2Video.onclick=function()
 {
-  alert("resize image");
+ 
   //window.open('https://github.com', '_blank', 'top=500,left=200,frame=false,nodeIntegration=no');
   // renderer process (mainWindow)
-const childWindow = window.open('', 'modal')
-childWindow.loadFile('index.html');
+// const childWindow = window.open('', 'modal')
+// childWindow.loadFile('index.html');
+alert(document.getElementsByClassName('ImageKeyword')[0].value);
+const l_resize=exec(`node sharpImages.js --keyword `+document.getElementsByClassName('ImageKeyword')[0].value, (error, stdout, stderr) => {
+ 
+  if (error) {
+    console.error(`exec error: ${error}`);
+    alert(`${error}`);
+   // return;
+   sleep(10000);
+   //now, make the video
+var videoFolder='C:/work/git/videodownloader_james/download/'+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
+const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder}`+`/output.mp4`, (error, stdout, stderr) => {
+ 
+  if (error) {
+    console.error(`exec error: ${error}`);
+    alert(`${error}`);
+    return;
+  }
+
+  l_makevideo.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_makevideo.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_makevideo.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+})
+
+//end make the video
+
+
+  }
+
+  l_resize.stdout.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdout: ${data}`);
+  });
+  l_resize.stdio.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stdio: ${data}`);
+  });
+  l_resize.stderr.on('data', data => {
+    percentage.innerText = data;
+
+    console.log(`stderr: ${data}`);
+  });
+
+   alert(`${stdout}`);
+   alert(`${stderr}`);
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+
+alert('resize images completed');
+
+
+})
   
 };
 
