@@ -554,7 +554,7 @@ if (!fs2.existsSync(savedir)) {
 }
 
 (async () => {
-  const results = await google.scrape(keyword, 200);
+  const results = await google.scrape(keyword, 2000);
 
   
   console.log(results);
