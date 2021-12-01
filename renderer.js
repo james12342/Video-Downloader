@@ -2,10 +2,11 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 
-var fs = require('fs-extra');
+
 const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const ytdl = require('ytdl-core');
+var fs = require('fs-extra');
 //const sharp = require("sharp");
 var youtubedl = require('youtube-dl');
 const { shell } = require('electron');
@@ -15,8 +16,7 @@ const fs1 = require("fs");
 const path1 = require("path");
 
 
-const { fork } = require('child_process')
-const ps = fork(`${__dirname}/server.js`)
+
 
 
 //alert(sharp.versions);
@@ -135,6 +135,8 @@ function sleep(ms) {
 }
 
 function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
+
+  alert("in download function now");
   let arguments = [];
 
 
@@ -349,6 +351,9 @@ function download(url, title, downloadAsAudio, youtubeUrl, saveAsTitleValue) {
 // start download button
 var startDownload = document.getElementsByClassName('startDownload')[0];
 
+// var startDownload=document.get
+// /html/body/div[1]/button[3]
+
 // open folder button
 var openFolder = document.getElementsByClassName('openFolder')[0];
 
@@ -431,6 +436,7 @@ openFolder.onclick = function () {
 
 
 startDownload.onclick = function () {
+  
   var youtubeUrl = document.getElementsByClassName('youtubeUrl')[0];
   var downloadAsAudio = document.getElementsByClassName('downloadAsAudio')[0];
   var saveAsTitle = document.getElementsByClassName('saveAsTitle')[0];
@@ -533,8 +539,6 @@ var Scraper = require('images-scraper');
 
 var fs2 = require('fs'),
     request = require('request');
-
-
 const google = new Scraper({
   puppeteer: {
     headless: true,
@@ -562,10 +566,15 @@ if (!fs2.existsSync(savedir)) {
     var url=jsonParsedArray[i].url;
     console.log('title:'+title+'||| url:'+url); 
    
-    download(url, savedir+'/google_'+i+'.jpg', function(){
-      //console.log(i+'---> download completed:'+title);
-
-    })
+    if(url.includes(".jpg"))
+    {
+      download(url, savedir+'/google_'+i+'.jpg', function(){
+        //console.log(i+'---> download completed:'+title);
+  
+      })
+      
+    }
+  
      
  }
 
@@ -669,10 +678,12 @@ ImagesGenVideo.onclick=function()
 
      //sleep(10000);
    //now, make the video
- 
-var videoFolder=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
-alert(`${videoFolder}`+`/output.mp4`);
-const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder}`+`/output.mp4`, (error, stdout, stderr) => {
+var videoFolder=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value;
+var videoFolder_output=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output';
+var videoFolder_output1=videoDownloadFullPath+"/"+document.getElementsByClassName('ImageKeyword')[0].value+'/output/output1';
+var videoName=document.getElementsByClassName('ImageKeyword')[0].value;
+//alert(`${videoFolder}`+`/output.mp4`);
+const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder_output1}`+`/img_%d.jpg -c:v libx264 -vf fps=25 -pix_fmt yuv420p `+`${videoFolder_output1}`+`/`+`${videoName}`+`.mp4`, (error, stdout, stderr) => {
  
   if (error) {
     console.error(`exec error: ${error}`);
@@ -703,8 +714,62 @@ const l_makevideo=exec(`ffmpeg -framerate 1/1 -i `+`${videoFolder}`+`/img_%d.jpg
   console.error(`stderr: ${stderr}`);
 })
 
-alert("Video Generated successfully at:"+`${videoFolder}`+`/output.mp4`);
+alert("Video Generated successfully at:"+`${videoFolder_output1}`);
 //end make the video
+//remove the images in output1
+fs1.readdir(videoFolder_output1, (err, files) => {
+  files.forEach(file => {
+   if(file.includes(".jpg"))
+   {
+    try {
+      fs.unlinkSync(videoFolder_output1+'/'+file)
+      //file removed
+    } catch(err) {
+      console.error(err)
+    }
+
+   }
+   
+  });
+})
+
+//remove the images in output
+fs1.readdir(videoFolder_output, (err, files) => {
+  files.forEach(file => {
+   if(file.includes(".jpg"))
+   {
+    try {
+      fs.unlinkSync(videoFolder_output+'/'+file)
+      //file removed
+    } catch(err) {
+      console.error(err)
+    }
+
+   }
+   
+  });
+})
+
+//end remove the images
+
+//remove the images in download folder
+fs1.readdir(videoFolder, (err, files) => {
+  files.forEach(file => {
+   if(file.includes(".jpg"))
+   {
+    try {
+      fs.unlinkSync(videoFolder+'/'+file)
+      //file removed
+    } catch(err) {
+      console.error(err)
+    }
+
+   }
+   
+  });
+})
+
+//end remove the images
 
 }
 
@@ -889,6 +954,35 @@ function myFunction() {
       console.log(err);
     });
 }
+
+function Function_DownloadVideo() {
+  alert("page-download videos");
+
+  var youtubeUrl = document.getElementsByClassName('youtubeUrl')[0].value;
+  alert(youtubeUrl);
+  var downloadAsAudio = document.getElementsByClassName('downloadAsAudio')[0];
+  var saveAsTitle = document.getElementsByClassName('saveAsTitle')[0];
+
+  var youtubeUrlValue = youtubeUrl.value;
+  var saveAsTitleValue = saveAsTitle.value;
+  //trim the videoname without space
+
+  saveAsTitleValue = saveAsTitleValue.replace(' ', '_');
+  var downloadAsAudioValue = downloadAsAudio.checked;
+
+  download(
+    youtubeUrlValue,
+    saveAsTitleValue,
+    downloadAsAudioValue,
+    youtubeUrl,
+    saveAsTitle
+  );
+
+  percentage.scrollIntoView();
+
+
+}
+
 
 /** SELECT DIRECTORY **/
 

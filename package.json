@@ -46,7 +46,7 @@
   "author": "Mayeaux",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^5.0.5",
+    "electron": "^5.0.13",
     "electron-builder": "^20.44.4"
   },
   "dependencies": {
@@ -58,6 +58,7 @@
     "images-scraper": "^6.4.0",
     "node-static": "^0.7.11",
     "nodemailer": "^6.7.1",
+    "requirejs": "^2.3.6",
     "sharp": "^0.29.3",
     "youtube-dl": "https://github.com/mayeaux/workingyoutubedl",
     "ytdl-core": "^0.29.2"
