@@ -3,6 +3,9 @@ const {app, BrowserWindow} = require('electron');
 const { maxHeaderSize } = require('http');
 const path = require('path');
 
+const { fork } = require('child_process')
+const ps = fork(`${__dirname}/server.js`)
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -55,5 +58,4 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 
 
-const { fork } = require('child_process')
-const ps = fork(`${__dirname}/server.js`)
+
