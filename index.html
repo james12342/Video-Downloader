@@ -1,103 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>健哥影片下载机</title>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  </head>
-  <body>
-    <div class="sup" style="text-align:center">
-      <!-- HEADEDR INFO -->
-      <h3 style="margin-top: 30px;margin-bottom: 18px;">健哥视频制作机，制作机中的战斗机</h3>
-      <a href="https://ytdl-org.github.io/youtube-dl/supportedsites.html" target="_blank"><p>支持全球 110个 网站源</p></a>
-    
-  <div class="titleDiv" style="height:10px">
-        <label style="font-size:22px;margin-bottom: 0;" for="">图片关键字</label>
-        <input type="text" class="ImageKeyword" id="ImageKeyword" value="" style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
-
+   <head>
+      <meta charset="UTF-8">
+      <title>健哥影片下载机</title>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+   </head>
+   <body>
+      <div class="sup" style="text-align:center">
+         <!-- HEADEDR INFO -->
+         <h3 style="margin-top: 20px;margin-bottom: 15px;">健哥视频制作机，制作机中的战斗机</h3>
+         <a href="https://ytdl-org.github.io/youtube-dl/supportedsites.html" target="_blank">
+            <p>支持全球 110个 网站源</p>
+         </a>
+         <div class="titleDiv" style="height:10px">
+            <label style="font-size:15px;margin-bottom: 0;" for="">图片关键字</label>
+            <input type="text" class="ImageKeyword" id="ImageKeyword" value="" style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
+         </div>
+         <br>
+         <br>
+         <label style="font-size:15px;margin-bottom: 0;" for="">接收视频邮箱地址</label>
+         <input type="text" class="emailList" value="workad_009@icloud.com,2602846629@qq.com,3359244988@QQ.COM,chenyuexiong1982@126.com,24971334@qq.com,787844913@qq.com,45104044@qq.com,13811723586@139.com,31446487@qq.com,15216250@qq.com,45662757@qq.com,28291092@qq.com,41125808@QQ.COM,19119779@qq.com"  style="width:450px;text-align:center;font-size:17px;width:100%;">
+         <br>
+         
+         <!-- DOWNLOAD VIDEO SECTION -->
+         <label style="font-size:15px;margin-bottom: 0;" for="">下载视频链接地址</label>
+         <br>
+         <!-- input to paste in youtube url-->
+         <input type="text" class="youtubeUrl" value=""  style="width:450px;text-align:center;font-size:17px;width:100%;">
+         <br>
+         
+         <!--paste button-->
+         <button type="button" onclick="myFunction()" class="btn btn-primary btn-sm" >Paste</button>
+         <br>
+         <div class="titleDiv" >
+            <label style="font-size:15px;margin-bottom: 0;" for="">视频名</label>
+            <input type="text" class="saveAsTitle" id="saveAsTitle" value="" style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
+         </div>
+         <div class="playlistDownloadingDiv" style="height:10px;display:none;margin-bottom:-30px;">
+            <h4 class="downloadPlaylistText" style="font-size:22px"># Item Playlist or Channel To Be Downloaded`</h4>
+         </div>
+         <br>
+         <label style="font-size:15px;margin-bottom: 0;" for="">添加视频文本</label>
+         <input type="text" class="AddvideoText" value=""  style="width:450px;text-align:center;font-size:17px;width:100%;">
+         <br>
+         
+         <!--SELECT DIRECTORY SECTION-->
+         <br>
+         <label for="" style="font-size: 15px">下载保存目录</label>
+         <input type="text" class="selectVideoDirectoryInput" value="./download"  style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
+         <!--{% comment %} <button type="button" class="btn btn-primary btn-sm selectVideoDirectory" style="margin-top:7px;margin-bottom:32px;">Select Directory</button> {% endcomment %}-->
+         <br>
+         <label for="" style="margin-right: 7px;margin-top:5px;">下载音频</label>
+         <input type="checkbox" class="downloadAsAudio">
+         <br>
+         <button class="startDownload btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;" onclick="Function_DownloadVideo()">开始下载</button>  
+         <button class="CompressVideo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">压缩视频</button>  
+         <button class="Watermarklogo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">添加水印</button>
+         <button class="startEmail btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">发送邮箱</button>
+         <button class="ImagesDownload btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图片下载</button> 
+         <button class="ImagesResize btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图片加工</button> 
+         <button class="ImagesGenVideo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图生视频</button> 
+         <button class="VideoAddText btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">视频加字</button> 
+         <br>
+         <br>
+         <h5 class="percentage" style="height:52px;overflow:hidden;margin-top: 23px;margin-bottom: 15px;font-size:22px;">下载进度: 还没开始下载呢，要下赶紧的呀！</h5>
+         <button class="openFolder btn btn-info btn-sm">打开保存目录</button>
+         <br>
+         <br>
+         <br>
       </div>
-<br>
-      <br>
-        <label style="font-size:22px;margin-bottom: 0;" for="">接收视频邮箱地址</label>
-        <input type="text" class="emailList" value="workad_009@icloud.com,2602846629@qq.com,3359244988@QQ.COM,chenyuexiong1982@126.com,24971334@qq.com,787844913@qq.com,45104044@qq.com,13811723586@139.com,31446487@qq.com,15216250@qq.com,45662757@qq.com,28291092@qq.com,41125808@QQ.COM,19119779@qq.com"  style="width:450px;text-align:center;font-size:17px;width:100%;">
-        
-      <br>
-      <br>
-
-      <!-- DOWNLOAD VIDEO SECTION -->
-      <label style="font-size:22px;margin-bottom: 0;" for="">下载视频链接地址</label>
-      <br>
-
-      <!-- input to paste in youtube url-->
-      <input type="text" class="youtubeUrl" value=""  style="width:450px;text-align:center;font-size:17px;width:100%;">
-
-      <br>
-
-      <!--paste button-->
-      <button type="button" onclick="myFunction()" class="btn btn-primary btn-sm" style="margin-top:7px;margin-bottom:32px;">Paste</button>
-
-      <br>
-      
-      <div class="titleDiv" style="height:10px">
-        <label style="font-size:22px;margin-bottom: 0;" for="">视频名</label>
-        <input type="text" class="saveAsTitle" id="saveAsTitle" value="" style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
-
-      </div>
-
-      <div class="playlistDownloadingDiv" style="height:10px;display:none;margin-bottom:-30px;">
-        <h4 class="downloadPlaylistText" style="font-size:22px"># Item Playlist or Channel To Be Downloaded`</h4>
-      </div>
-
-      <br>
-
-      <br>
-
-       <!--SELECT DIRECTORY SECTION-->
-
-      <br>
-      <label for="" style="font-size: 19px">下载保存目录</label>
-
-      <input type="text" class="selectVideoDirectoryInput" value="./download"  style="text-align:center;width:100%;margin-bottom:9px;font-size:17px;">
-
-      <button type="button" class="btn btn-primary btn-sm selectVideoDirectory" style="margin-top:7px;margin-bottom:32px;">Select Directory</button>
-
-      <br>
-
-      <label for="" style="margin-right: 7px;margin-top:5px;">下载音频</label>
-      <input type="checkbox" class="downloadAsAudio">
-      <br>
-      <button class="startDownload btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;" onclick="Function_DownloadVideo()">开始下载</button>  
-      <button class="CompressVideo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">压缩视频</button>  
-      <button class="Watermarklogo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">添加水印</button>
-      <button class="startEmail btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">发送邮箱</button>
-      <button class="ImagesDownload btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图片下载</button> 
-      <button class="ImagesResize btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图片加工</button> 
-      <button class="ImagesGenVideo btn btn-success" style="height: 43px;width: 100px;font-size: 12px;margin-top:20px;">图生视频</button> 
-      <!-- <button class="RefreshNode btn btn-success" style="height: 43px;width: 100px;font-size: 15px;margin-top:20px;">Refresh</button>  -->
-      <br>
-
-     
-
-      <br>
-      <h5 class="percentage" style="height:52px;overflow:hidden;margin-top: 23px;margin-bottom: 15px;font-size:22px;">下载进度: 还没开始下载呢，要下赶紧的呀！</h5>
-
-
-
-      <button class="openFolder btn btn-info btn-sm">打开保存目录</button>
-      <br>
-      <br>
-      <br>
-
-
-    </div>
-
-
-
-    <script src="./renderer.js"></script>
-  </body>
-    <script>
-//      var selectVideoDirectoryInput = document.getElementsByClassName('selectVideoDirectoryInput')[0];
-//      selectVideoDirectoryInput.value = './videos';
-    </script>
+      <script src="./renderer.js"></script>
+   </body>
+   <script>
+      //      var selectVideoDirectoryInput = document.getElementsByClassName('selectVideoDirectoryInput')[0];
+      //      selectVideoDirectoryInput.value = './videos';
+          
+   </script>
 </html>
